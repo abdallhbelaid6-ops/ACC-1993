@@ -392,8 +392,26 @@
         </main>
     </div>
 
+    <!-- Firebase SDK Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA7uvicRiGGgvTKjyfVKr3MofuO1gwof6c",
+            authDomain: "acc-1993.firebaseapp.com",
+            projectId: "acc-1993",
+            storageBucket: "acc-1993.firebasestorage.app",
+            messagingSenderId: "468585162756",
+            appId: "1:468585162756:web:7f54080202c66176b02d51",
+            measurementId: "G-VQVNBBWHMV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
+
     <script>
-        // تصفير البيانات (بدون أي بيانات افتراضية مسبقة)
         let departments = JSON.parse(localStorage.getItem('zs_depts')) || [];
         let supervisors = JSON.parse(localStorage.getItem('zs_sups')) || [];
         let admins = JSON.parse(localStorage.getItem('zs_admins')) || [{user: "admin", pass: "1234"}];
