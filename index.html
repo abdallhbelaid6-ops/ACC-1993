@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منظومة بحوث التخرج - كلية العلوم والتقنية الشاطئ</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex h-screen overflow-hidden">
+
+    <!-- شاشة تسجيل الدخول العامة -->
+    <div id="login-modal" class="fixed inset-0 bg-blue-950/80 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6">
+            <div class="text-center space-y-2">
+                <div class="bg-blue-100 text-blue-900 w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-2xl font-bold">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <h2 class="text-xl font-black text-gray-800">تسجيل الدخول للمنظومة</h2>
+                <p class="text-xs text-gray-500">وزارة التعليم التقني العالي - كلية العلوم والتقنية الشاطئ</p>
+            </div>
+            <form onsubmit="handleGeneralLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-gray-700">اسم المستخدم</label>
+                    <input type="text" id="gen-user" required class="w-full border rounded-xl p-3 text-sm outline-none" placeholder="أدخل اسم المستخدم...">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-gray-700">كلمة المرور</label>
+                    <input type="password" id="gen-pass" required class="w-full border rounded-xl p-3 text-sm outline-none" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-blue-900 text-white py-3 rounded-xl font-bold hover:bg-blue-800 transition shadow-md">
+                    دخول المنظومة
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة دخول لوحة الإدارة بكلمة مرور -->
+    <div id="admin-login-modal" class="fixed inset-0 bg-gray-950/80 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6">
+            <div class="text-center space-y-2">
+                <div class="bg-amber-100 text-amber-800 w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-2xl font-bold">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h2 class="text-xl font-black text-gray-800">دخول لوحة الإدارة المحمية</h2>
+                <p class="text-xs text-gray-500">الرقم السري الافتراضي: 1234 (أو كلمة مرور الأدمن المضاف)</p>
+            </div>
+            <form onsubmit="verifyAdminPassword(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-gray-700">كلمة مرور الإدارة</label>
+                    <input type="password" id="admin-secret-pass" required class="w-full border rounded-xl p-3 text-sm outline-none border-amber-300 focus:ring-2 focus:ring-amber-500" placeholder="••••••••">
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="document.getElementById('admin-login-modal').classList.add('hidden')" class="w-1/2 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold">إلغاء</button>
+                    <button type="submit" class="w-1/2 bg-amber-600 text-white py-3 rounded-xl font-bold hover:bg-amber-700 transition">تحقق ودخول</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sidebar (القائمة الجانبية) -->
+    <aside class="w-64 bg-blue-950 text-white flex flex-col justify-between hidden md:flex shrink-0">
+        <div>
+            <div class="p-5 border-b border-blue-900 flex items-center gap-3">
+                <div class="bg-blue-800 p-2 rounded-xl text-white text-xl">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 class="font-black text-sm">منظومة بحوث التخرج</h1>
+                    <p class="text-[10px] text-blue-300">كلية العلوم والتقنية الشاطئ</p>
+                </div>
+            </div>
+
+            <nav class="p-3 space-y-1 text-sm font-medium">
+                <button onclick="switchTab('home')" id="nav-home" class="w-full text-right px-4 py-3 rounded-xl bg-blue-900 text-white flex items-center gap-3 transition">
+                    <i class="fa-solid fa-house w-5"></i> الرئيسية
+                </button>
+                <button onclick="switchTab('register')" id="nav-register" class="w-full text-right px-4 py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
+                    <i class="fa-solid fa-file-circle-plus w-5"></i> تسجيل بحوث جديدة
+                </button>
+                <button onclick="switchTab('students')" id="nav-students" class="w-full text-right px-4 py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
+                    <i class="fa-solid fa-book w-5"></i> قائمة البحوث والطلبة
+                </button>
+                <button onclick="switchTab('supervisors')" id="nav-supervisors" class="w-full text-right px-4 py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
+                    <i class="fa-solid fa-chalkboard-user w-5"></i> قائمة المشرفين
+                </button>
+                <button onclick="openAdminPanelCheck()" id="nav-admin-panel" class="w-full text-right px-4 py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
+                    <i class="fa-solid fa-gears w-5"></i> لوحة الإدارة
+                </button>
+                <button onclick="switchTab('reports')" id="nav-reports" class="w-full text-right px-4 py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
+                    <i class="fa-solid fa-chart-bar w-5"></i> التقارير والإحصائيات
+                </button>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-blue-900 text-xs text-blue-300 text-center">
+            وزارة التعليم التقني العالي
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col h-screen overflow-y-auto">
+        
+        <header class="bg-white shadow-xs px-6 py-3 flex justify-between items-center shrink-0">
+            <div class="flex items-center gap-3">
+                <span class="font-bold text-gray-700 text-sm">وزارة التعليم التقني العالي — كلية العلوم والتقنية الشاطئ</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <h4 class="font-bold text-xs text-gray-800">أ. عبدالله أمحمد بلعيد لسود</h4>
+                    <p class="text-[10px] text-gray-500">مدير النظام</p>
+                </div>
+                <div class="bg-blue-100 text-blue-900 w-9 h-9 rounded-full flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <main class="p-6 space-y-6 flex-1">
+            
+            <!-- HOME -->
+            <div id="tab-home" class="tab-content space-y-6">
+                <div class="bg-blue-50 border border-blue-100 p-6 rounded-2xl flex justify-between items-center shadow-xs">
+                    <div>
+                        <h2 class="text-2xl font-black text-blue-950">مرحباً بك في منظومة بحوث التخرج</h2>
+                        <p class="text-xs text-blue-700 mt-1">إدارة وتنظيم بحوث التخرج بكل سهولة وفاعلية — كلية العلوم والتقنية الشاطئ</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-100 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold text-gray-500">المشرفين</span>
+                            <span class="bg-amber-100 text-amber-800 p-2 rounded-xl text-sm"><i class="fa-solid fa-chalkboard-user"></i></span>
+                        </div>
+                        <h3 class="text-3xl font-black text-gray-800 my-2" id="stat-sups">0</h3>
+                        <button onclick="switchTab('supervisors')" class="text-xs text-blue-600 font-bold text-right flex items-center gap-1 hover:underline">عرض التفاصيل <i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-100 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold text-gray-500">الطلبة الخريجين</span>
+                            <span class="bg-blue-100 text-blue-800 p-2 rounded-xl text-sm"><i class="fa-solid fa-graduation-cap"></i></span>
+                        </div>
+                        <h3 class="text-3xl font-black text-gray-800 my-2" id="stat-students">0</h3>
+                        <button onclick="switchTab('students')" class="text-xs text-blue-600 font-bold text-right flex items-center gap-1 hover:underline">عرض التفاصيل <i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-100 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold text-gray-500">بحوث معتمدة</span>
+                            <span class="bg-emerald-100 text-emerald-800 p-2 rounded-xl text-sm"><i class="fa-solid fa-circle-check"></i></span>
+                        </div>
+                        <h3 class="text-3xl font-black text-gray-800 my-2" id="stat-approved">0</h3>
+                        <button onclick="switchTab('reports')" class="text-xs text-blue-600 font-bold text-right flex items-center gap-1 hover:underline">عرض التفاصيل <i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-100 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold text-gray-500">بحوث قيد المراجعة</span>
+                            <span class="bg-purple-100 text-purple-800 p-2 rounded-xl text-sm"><i class="fa-solid fa-clock"></i></span>
+                        </div>
+                        <h3 class="text-3xl font-black text-gray-800 my-2" id="stat-pending">0</h3>
+                        <button onclick="switchTab('reports')" class="text-xs text-blue-600 font-bold text-right flex items-center gap-1 hover:underline">عرض التفاصيل <i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2"><i class="fa-solid fa-grid-2 text-blue-900"></i> أقسام المنظومة</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div onclick="switchTab('register')" class="bg-blue-600 text-white p-6 rounded-2xl shadow-sm cursor-pointer hover:bg-blue-700 transition space-y-4">
+                            <div class="flex justify-between items-center"><i class="fa-solid fa-file-circle-plus text-2xl"></i> <i class="fa-solid fa-arrow-left"></i></div>
+                            <div><h4 class="font-bold text-lg">تسجيل بحوث جديدة</h4><p class="text-xs text-blue-100 mt-1">إضافة بحث جديد مع التحقق من الشروط الأكاديمية</p></div>
+                        </div>
+
+                        <div onclick="switchTab('students')" class="bg-emerald-600 text-white p-6 rounded-2xl shadow-sm cursor-pointer hover:bg-emerald-700 transition space-y-4">
+                            <div class="flex justify-between items-center"><i class="fa-solid fa-book text-2xl"></i> <i class="fa-solid fa-arrow-left"></i></div>
+                            <div><h4 class="font-bold text-lg">قائمة البحوث والطلبة</h4><p class="text-xs text-emerald-100 mt-1">عرض وتصفية بيانات الأبحاث المسجلة</p></div>
+                        </div>
+
+                        <div onclick="switchTab('supervisors')" class="bg-purple-600 text-white p-6 rounded-2xl shadow-sm cursor-pointer hover:bg-purple-700 transition space-y-4">
+                            <div class="flex justify-between items-center"><i class="fa-solid fa-chalkboard-user text-2xl"></i> <i class="fa-solid fa-arrow-left"></i></div>
+                            <div><h4 class="font-bold text-lg">قائمة المشرفين</h4><p class="text-xs text-purple-100 mt-1">عرض بيانات المشرفين وأقسامهم</p></div>
+                        </div>
+
+                        <div onclick="openAdminPanelCheck()" class="bg-cyan-700 text-white p-6 rounded-2xl shadow-sm cursor-pointer hover:bg-cyan-800 transition space-y-4">
+                            <div class="flex justify-between items-center"><i class="fa-solid fa-gears text-2xl"></i> <i class="fa-solid fa-arrow-left"></i></div>
+                            <div><h4 class="font-bold text-lg">لوحة الإدارة</h4><p class="text-xs text-cyan-100 mt-1">إدارة النظام وإضافة الأدمن</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REGISTER -->
+            <div id="tab-register" class="tab-content hidden space-y-6 bg-white p-6 rounded-2xl border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-file-circle-plus text-blue-900"></i> تسجيل بحث تخرج جديد (يُدعم حتى 4 طلاب بأرقامهم القيدية)
+                </h2>
+                <form id="researchForm" onsubmit="submitResearch(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">نوع التسجيل</label>
+                        <select id="reg-type" class="w-full border rounded-lg p-2.5 text-sm outline-none font-semibold text-blue-900">
+                            <option value="new">بحث جديد (قيد الإنجاز الحالي)</option>
+                            <option value="old">بحث سابق (أرشيف قديم معتمد)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">سنة التخرج (مثال: 2025/2026)</label>
+                        <input type="text" id="reg-year" value="2025/2026" required class="w-full border rounded-lg p-2.5 text-sm outline-none font-bold text-blue-900">
+                    </div>
+
+                    <div class="md:col-span-2 border p-4 rounded-xl bg-gray-50 space-y-3">
+                        <label class="block text-sm font-bold text-gray-700"><i class="fa-solid fa-user-group text-blue-900 ml-1"></i> بيانات الطلاب (الاسم والرقم القيدي - الحد الأقصى 4 طلاب)</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="flex gap-2">
+                                <input type="text" id="s1-name" placeholder="اسم الطالب الأول" required class="flex-1 border rounded-lg p-2 text-sm bg-white outline-none">
+                                <input type="text" id="s1-id" placeholder="الرقم القيدي" required class="w-28 border rounded-lg p-2 text-sm bg-white outline-none">
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="s2-name" placeholder="اسم الطالب الثاني (اختياري)" class="flex-1 border rounded-lg p-2 text-sm bg-white outline-none">
+                                <input type="text" id="s2-id" placeholder="الرقم القيدي" class="w-28 border rounded-lg p-2 text-sm bg-white outline-none">
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="s3-name" placeholder="اسم الطالب الثالث (اختياري)" class="flex-1 border rounded-lg p-2 text-sm bg-white outline-none">
+                                <input type="text" id="s3-id" placeholder="الرقم القيدي" class="w-28 border rounded-lg p-2 text-sm bg-white outline-none">
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="s4-name" placeholder="اسم الطالب الرابع (اختياري)" class="flex-1 border rounded-lg p-2 text-sm bg-white outline-none">
+                                <input type="text" id="s4-id" placeholder="الرقم القيدي" class="w-28 border rounded-lg p-2 text-sm bg-white outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">التخصص</label>
+                        <select id="reg-major" class="w-full border rounded-lg p-2.5 text-sm outline-none font-semibold text-blue-900 bg-blue-50/50"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">المشرف الرئيسي</label>
+                        <select id="reg-supervisor" class="w-full border rounded-lg p-2.5 text-sm outline-none font-semibold text-blue-900 bg-blue-50/50"></select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium mb-1">عنوان البحث كاملاً</label>
+                        <input type="text" id="reg-title" required class="w-full border rounded-lg p-2.5 text-sm outline-none" placeholder="أدخل عنوان البحث...">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium mb-1">رفع ملف البحث (PDF بسعة غير محدودة)</label>
+                        <input type="file" id="reg-pdf-file" accept=".pdf" class="w-full border rounded-lg p-2 text-sm bg-gray-50">
+                    </div>
+                    <div class="md:col-span-2">
+                        <button type="submit" class="bg-blue-900 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-800 transition shadow-sm">
+                            <i class="fa-solid fa-check ml-1"></i> حفظ وتسجيل البحث
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- STUDENTS / RESEARCH LIST -->
+            <div id="tab-students" class="tab-content hidden space-y-6 bg-white p-6 rounded-2xl border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-book text-blue-900"></i> قائمة البحوث والطلبة المسجلين
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm">
+                        <thead class="bg-gray-50 text-gray-700">
+                            <tr>
+                                <th class="p-3">الطلبة وأرقامهم القيدية</th>
+                                <th class="p-3">التخصص / السنة</th>
+                                <th class="p-3">عنوان البحث</th>
+                                <th class="p-3">المشرف</th>
+                                <th class="p-3">إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y" id="students-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SUPERVISORS -->
+            <div id="tab-supervisors" class="tab-content hidden space-y-6 bg-white p-6 rounded-2xl border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-chalkboard-user text-blue-900"></i> قائمة أعضاء هيئة التدريس والمشرفين
+                </h2>
+                <div id="supervisors-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+
+            <!-- REPORTS -->
+            <div id="tab-reports" class="tab-content hidden space-y-6 bg-white p-6 rounded-2xl border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-bar text-blue-900"></i> التقارير والطباعة الرسمية
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="border p-5 rounded-2xl bg-blue-50/50 space-y-3 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-blue-950 text-base">تقرير البحوث الجارية</h3>
+                            <p class="text-xs text-gray-600 mt-1">قائمة البحوث قيد الإنجاز مع أسماء الطلاب وأرقامهم القيدية.</p>
+                        </div>
+                        <button onclick="printReport('current')" class="bg-blue-900 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-blue-800 transition shadow">
+                            <i class="fa-solid fa-print ml-1"></i> طباعة تقرير البحوث الجارية
+                        </button>
+                    </div>
+
+                    <div class="border p-5 rounded-2xl bg-purple-50/50 space-y-3 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-purple-950 text-base">تقرير لجان المناقشة</h3>
+                            <p class="text-xs text-gray-600 mt-1">مواعيد القاعات وأسماء لجان المناقشة ورؤسائها.</p>
+                        </div>
+                        <button onclick="printReport('defense')" class="bg-purple-700 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-purple-800 transition shadow">
+                            <i class="fa-solid fa-print ml-1"></i> طباعة تقرير المناقشات
+                        </button>
+                    </div>
+
+                    <div class="border p-5 rounded-2xl bg-amber-50/50 space-y-3 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-amber-950 text-base">تقرير الأرشيف السابق</h3>
+                            <p class="text-xs text-gray-600 mt-1">الأرشيف الإلكتروني الشامل للبحوث المعتمدة.</p>
+                        </div>
+                        <button onclick="printReport('archive')" class="bg-amber-700 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-amber-800 transition shadow">
+                            <i class="fa-solid fa-print ml-1"></i> طباعة تقرير الأرشيف
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN PANEL -->
+            <div id="tab-admin-panel" class="tab-content hidden space-y-6 bg-white p-6 rounded-2xl border border-gray-100">
+                <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-amber-950"><i class="fa-solid fa-gears ml-2"></i> لوحة الإدارة والتحكم المركزي</h2>
+                        <p class="text-xs text-amber-800 mt-1">إدارة التخصصات، المشرفين، إضافة الأدمن، والنسخ الاحتياطي.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="exportBackup()" class="bg-amber-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-amber-800"><i class="fa-solid fa-download ml-1"></i> تصدير Backup</button>
+                        <label class="bg-blue-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 cursor-pointer">
+                            <i class="fa-solid fa-upload ml-1"></i> استعادة Backup <input type="file" id="import-file" onchange="importBackup(event)" class="hidden" accept=".json">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                    <div class="border p-4 rounded-xl space-y-3 bg-gray-50">
+                        <h3 class="font-bold text-gray-800 border-b pb-2 text-sm"><i class="fa-solid fa-sitemap text-blue-900 ml-1"></i> التخصصات</h3>
+                        <form onsubmit="addDepartment(event)" class="space-y-2">
+                            <input type="text" id="new-dept" placeholder="اسم التخصص..." required class="w-full border rounded-lg p-2 text-xs bg-white outline-none">
+                            <button type="submit" class="w-full bg-blue-900 text-white py-1.5 rounded-lg text-xs font-semibold">إضافة تخصص</button>
+                        </form>
+                        <div id="admin-dept-list" class="space-y-2 mt-2 max-h-32 overflow-y-auto"></div>
+                    </div>
+
+                    <div class="border p-4 rounded-xl space-y-3 bg-gray-50">
+                        <h3 class="font-bold text-gray-800 border-b pb-2 text-sm"><i class="fa-solid fa-user-plus text-blue-900 ml-1"></i> المشرفون</h3>
+                        <form onsubmit="addSupervisor(event)" class="space-y-2">
+                            <input type="text" id="sup-name" placeholder="اسم المشرف" required class="w-full border rounded-lg p-2 text-xs bg-white outline-none">
+                            <input type="text" id="sup-spec" placeholder="التخصص" required class="w-full border rounded-lg p-2 text-xs bg-white outline-none">
+                            <button type="submit" class="w-full bg-blue-900 text-white py-1.5 rounded-lg text-xs font-semibold">إضافة مشرف</button>
+                        </form>
+                        <div id="admin-sup-list" class="space-y-2 mt-2 max-h-32 overflow-y-auto"></div>
+                    </div>
+
+                    <div class="border p-4 rounded-xl space-y-3 bg-gray-50">
+                        <h3 class="font-bold text-gray-800 border-b pb-2 text-sm"><i class="fa-solid fa-user-shield text-blue-900 ml-1"></i> إدارة الأدمن</h3>
+                        <form onsubmit="addAdminUser(event)" class="space-y-2">
+                            <input type="text" id="admin-name" placeholder="اسم المستخدم" required class="w-full border rounded-lg p-2 text-xs bg-white outline-none">
+                            <input type="password" id="admin-pass" placeholder="كلمة المرور" required class="w-full border rounded-lg p-2 text-xs bg-white outline-none">
+                            <button type="submit" class="w-full bg-blue-900 text-white py-1.5 rounded-lg text-xs font-semibold">إضافة أدمن جديد</button>
+                        </form>
+                        <div id="admin-users-list" class="space-y-2 mt-2 max-h-32 overflow-y-auto"></div>
+                    </div>
+
+                    <div class="border p-4 rounded-xl space-y-3 bg-gray-50">
+                        <h3 class="font-bold text-gray-800 border-b pb-2 text-sm"><i class="fa-solid fa-calendar-days text-blue-900 ml-1"></i> المناقشات</h3>
+                        <form onsubmit="addDefenseSession(event)" class="space-y-2">
+                            <input type="text" id="def-title" placeholder="البحث أو الطالب" required class="w-full border rounded-lg p-1 text-xs bg-white outline-none">
+                            <input type="text" id="def-head" placeholder="رئيس اللجنة" required class="w-full border rounded-lg p-1 text-xs bg-white outline-none">
+                            <input type="text" id="def-date" placeholder="التاريخ" required class="w-full border rounded-lg p-1 text-xs bg-white outline-none">
+                            <input type="text" id="def-hall" placeholder="القاعة" required class="w-full border rounded-lg p-1 text-xs bg-white outline-none">
+                            <button type="submit" class="w-full bg-blue-900 text-white py-1.5 rounded-lg text-xs font-semibold">جدولة</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="border p-4 rounded-xl bg-gray-50 mt-4 space-y-2">
+                    <h3 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-clock-rotate-left text-blue-900 ml-1"></i> السجل الزمني للإجراءات (Audit Log)</h3>
+                    <div id="audit-log-box" class="bg-white border rounded-lg p-3 text-xs space-y-1 max-h-36 overflow-y-auto"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // تصفير البيانات (بدون أي بيانات افتراضية مسبقة)
+        let departments = JSON.parse(localStorage.getItem('zs_depts')) || [];
+        let supervisors = JSON.parse(localStorage.getItem('zs_sups')) || [];
+        let admins = JSON.parse(localStorage.getItem('zs_admins')) || [{user: "admin", pass: "1234"}];
+        let researches = JSON.parse(localStorage.getItem('zs_res')) || [];
+        let defenseSessions = JSON.parse(localStorage.getItem('zs_defs')) || [];
+        let auditLogs = JSON.parse(localStorage.getItem('zs_logs')) || [];
+
+        function logAction(action) {
+            const time = new Date().toLocaleString('ar-LY');
+            auditLogs.unshift({ action, time });
+            localStorage.setItem('zs_logs', JSON.stringify(auditLogs));
+        }
+
+        function handleGeneralLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('gen-user').value.trim();
+            const p = document.getElementById('gen-pass').value.trim();
+            let valid = admins.some(a => a.user === u && a.pass === p) || (u === "admin" && p === "1234");
+            if(valid) {
+                document.getElementById('login-modal').classList.add('hidden');
+                logAction(`تسجيل دخول للنظام بواسطة: ${u}`);
+            } else {
+                alert('اسم المستخدم أو كلمة المرور غير صحيحة!');
+            }
+        }
+
+        function openAdminPanelCheck() {
+            document.getElementById('admin-login-modal').classList.remove('hidden');
+        }
+
+        function verifyAdminPassword(event) {
+            event.preventDefault();
+            const pass = document.getElementById('admin-secret-pass').value.trim();
+            let valid = pass === '1234' || admins.some(a => a.pass === pass);
+            if(valid) {
+                document.getElementById('admin-login-modal').classList.add('hidden');
+                document.getElementById('admin-secret-pass').value = '';
+                switchTab('admin-panel');
+                logAction('دخول ناجح لوحة الإدارة');
+            } else {
+                alert('كلمة المرور خطأ! الافتراضية هي 1234');
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('zs_depts', JSON.stringify(departments));
+            localStorage.setItem('zs_sups', JSON.stringify(supervisors));
+            localStorage.setItem('zs_admins', JSON.stringify(admins));
+            localStorage.setItem('zs_res', JSON.stringify(researches));
+            localStorage.setItem('zs_defs', JSON.stringify(defenseSessions));
+            updateDashboardStats();
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('stat-sups').innerText = supervisors.length;
+            document.getElementById('stat-students').innerText = researches.length * 2;
+            document.getElementById('stat-approved').innerText = researches.filter(r => r.type === 'old').length;
+            document.getElementById('stat-pending').innerText = researches.filter(r => r.type === 'new').length;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            
+            document.querySelectorAll('aside nav button').forEach(el => {
+                el.classList.remove('bg-blue-900', 'text-white');
+                el.classList.add('text-blue-200', 'hover:bg-blue-900/50');
+            });
+            const activeNav = document.getElementById('nav-' + tabId);
+            if(activeNav) {
+                activeNav.classList.add('bg-blue-900', 'text-white');
+                activeNav.classList.remove('text-blue-200', 'hover:bg-blue-900/50');
+            }
+            
+            if(tabId === 'register') updateDropdowns();
+            if(tabId === 'students') renderStudents();
+            if(tabId === 'supervisors') renderSupervisors();
+            if(tabId === 'admin-panel') { renderAdminLists(); renderAuditLogs(); }
+            if(tabId === 'home') updateDashboardStats();
+        }
+
+        function updateDropdowns() {
+            const majorSel = document.getElementById('reg-major');
+            majorSel.innerHTML = '';
+            if(departments.length === 0) {
+                majorSel.innerHTML = `<option value="">الرجاء إضافة تخصصات من لوحة الإدارة أولاً</option>`;
+            } else {
+                departments.forEach(d => majorSel.innerHTML += `<option value="${d}">${d}</option>`);
+            }
+
+            const supSel = document.getElementById('reg-supervisor');
+            supSel.innerHTML = '';
+            if(supervisors.length === 0) {
+                supSel.innerHTML = `<option value="">الرجاء إضافة مشرفين من لوحة الإدارة أولاً</option>`;
+            } else {
+                supervisors.forEach(s => supSel.innerHTML += `<option value="${s.name}">${s.name} (${s.spec})</option>`);
+            }
+        }
+
+        function submitResearch(e) {
+            e.preventDefault();
+            if(departments.length === 0 || supervisors.length === 0) {
+                alert('تنبيه: يجب إضافة تخصص ومشرف واحد على الأقل من لوحة الإدارة قبل تسجيل البحوث!');
+                return;
+            }
+            const type = document.getElementById('reg-type').value;
+            const year = document.getElementById('reg-year').value;
+            const title = document.getElementById('reg-title').value;
+            const major = document.getElementById('reg-major').value;
+            const supervisor = document.getElementById('reg-supervisor').value;
+            const pdfFile = document.getElementById('reg-pdf-file').files[0];
+            const pdfName = pdfFile ? pdfFile.name : "بدون ملف مرفق";
+
+            let students = [];
+            for(let i=1; i<=4; i++) {
+                let name = document.getElementById(`s${i}-name`).value.trim();
+                let id = document.getElementById(`s${i}-id`).value.trim();
+                if(name) {
+                    students.push({ name, id: id || 'بدون رقم' });
+                }
+            }
+
+            researches.push({ id: Date.now(), type, year, title, major, supervisor, students, pdfName });
+            saveData();
+            logAction(`تسجيل بحث جديد: ${title}`);
+            alert('تم تسجيل البحث بنجاح!');
+            document.getElementById('researchForm').reset();
+            document.getElementById('reg-year').value = '2025/2026';
+            switchTab('students');
+        }
+
+        function renderStudents() {
+            const tbody = document.getElementById('students-table-body');
+            tbody.innerHTML = '';
+            if(researches.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">لا توجد بحوث مسجلة حالياً</td></tr>`;
+                return;
+            }
+            researches.forEach((r, index) => {
+                let studsHtml = r.students.map(s => `${s.name} (قيدي: ${s.id})`).join('<br>');
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3 font-semibold text-xs">${studsHtml}</td>
+                        <td class="p-3 text-xs">${r.major}<br><span class="text-gray-400">سنة: ${r.year}</span></td>
+                        <td class="p-3 font-bold text-sm text-blue-950">${r.title}</td>
+                        <td class="p-3 text-xs">${r.supervisor}</td>
+                        <td class="p-3"><button onclick="deleteResearch(${index})" class="bg-red-100 text-red-600 px-2.5 py-1 rounded text-xs font-bold hover:bg-red-200">حذف</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteResearch(index) {
+            if(confirm('هل أنت متأكد من حذف هذا البحث؟')) {
+                logAction(`حذف بحث: ${researches[index].title}`);
+                researches.splice(index, 1);
+                saveData();
+                renderStudents();
+            }
+        }
+
+        function printReport(type) {
+            let htmlContent = `
+                <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 20px;">
+                    <div style="text-align: center; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px;">
+                        <h2 style="color: #1e3a8a; margin: 0; font-size: 16px;">وزارة التعليم التقني العالي</h2>
+                        <h3 style="color: #111827; margin: 5px 0; font-size: 14px;">كلية العلوم والتقنية الشاطئ</h3>
+                        <h4 style="color: #4b5563; margin: 5px 0; font-size: 13px;">`;
+            
+            if(type === 'current') htmlContent += `تقرير البحوث الجارية وقيد الإنجاز`;
+            else if(type === 'defense') htmlContent += `تقرير لجان المناقشة وتحديد المواعيد`;
+            else if(type === 'archive') htmlContent += `تقرير الأرشيف الإلكتروني الشامل`;
+
+            htmlContent += `</h4><p style="font-size: 11px; color: #6b7280;">تاريخ التقرير: ${new Date().toLocaleDateString('ar-LY')}</p></div>`;
+
+            if(type === 'current') {
+                const currentRes = researches.filter(r => r.type === 'new');
+                if(currentRes.length === 0) {
+                    htmlContent += `<p style="text-align: center; color: #6b7280;">لا توجد بحوث جارية مسجلة حالياً.</p>`;
+                } else {
+                    htmlContent += `<table style="width: 100%; border-collapse: collapse; font-size: 12px;" border="1">
+                        <tr style="background: #f3f4f6;"><th style="padding: 8px;">الطلاب والأرقام القيدية</th><th style="padding: 8px;">التخصص وسنة التخرج</th><th style="padding: 8px;">عنوان البحث</th><th style="padding: 8px;">المشرف</th></tr>`;
+                    currentRes.forEach(r => {
+                        let st = r.students.map(s => `${s.name} (${s.id})`).join('<br>');
+                        htmlContent += `<tr><td style="padding: 8px;">${st}</td><td style="padding: 8px;">${r.major} (${r.year})</td><td style="padding: 8px; font-weight: bold;">${r.title}</td><td style="padding: 8px;">${r.supervisor}</td></tr>`;
+                    });
+                    htmlContent += `</table>`;
+                }
+            } else if(type === 'defense') {
+                if(defenseSessions.length === 0) {
+                    htmlContent += `<p style="text-align: center; color: #6b7280;">لا توجد لجان مناقشة مجدولة حالياً.</p>`;
+                } else {
+                    htmlContent += `<table style="width: 100%; border-collapse: collapse; font-size: 12px;" border="1">
+                        <tr style="background: #f3f4f6;"><th style="padding: 8px;">عنوان البحث / الطالب</th><th style="padding: 8px;">رئيس اللجنة</th><th style="padding: 8px;">التاريخ واليوم</th><th style="padding: 8px;">القاعة والساعة</th></tr>`;
+                    defenseSessions.forEach(d => {
+                        htmlContent += `<tr><td style="padding: 8px; font-weight: bold;">${d.title}</td><td style="padding: 8px;">${d.head}</td><td style="padding: 8px;">${d.date}</td><td style="padding: 8px;">${d.hall}</td></tr>`;
+                    });
+                    htmlContent += `</table>`;
+                }
+            } else if(type === 'archive') {
+                const oldRes = researches.filter(r => r.type === 'old');
+                if(oldRes.length === 0) {
+                    htmlContent += `<p style="text-align: center; color: #6b7280;">لا توجد بحوث مؤرشفة سابقة.</p>`;
+                } else {
+                    htmlContent += `<table style="width: 100%; border-collapse: collapse; font-size: 12px;" border="1">
+                        <tr style="background: #f3f4f6;"><th style="padding: 8px;">الطلاب</th><th style="padding: 8px;">السنة</th><th style="padding: 8px;">عنوان البحث</th><th style="padding: 8px;">المشرف</th></tr>`;
+                    oldRes.forEach(r => {
+                        let st = r.students.map(s => `${s.name}`).join(', ');
+                        htmlContent += `<tr><td style="padding: 8px;">${st}</td><td style="padding: 8px;">${r.year}</td><td style="padding: 8px; font-weight: bold;">${r.title}</td><td style="padding: 8px;">${r.supervisor}</td></tr>`;
+                    });
+                    htmlContent += `</table>`;
+                }
+            }
+
+            htmlContent += `</div>`;
+            const printWin = window.open('', '', 'height=600,width=800');
+            printWin.document.write(htmlContent);
+            printWin.document.close();
+            printWin.focus();
+            setTimeout(() => { printWin.print(); printWin.close(); }, 500);
+            logAction(`طباعة تقرير: ${type}`);
+        }
+
+        function exportBackup() {
+            const backupData = { departments, supervisors, admins, researches, defenseSessions, auditLogs };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `Shatei_Grad_System_Backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            logAction('تصدير نسخة احتياطية Backup');
+        }
+
+        function importBackup(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const parsed = JSON.parse(event.target.result);
+                    if(parsed.departments && parsed.researches) {
+                        departments = parsed.departments;
+                        supervisors = parsed.supervisors || [];
+                        admins = parsed.admins || [{user: "admin", pass: "1234"}];
+                        researches = parsed.researches || [];
+                        defenseSessions = parsed.defenseSessions || [];
+                        auditLogs = parsed.auditLogs || [];
+                        saveData();
+                        alert('تمت استعادة النسخة الاحتياطية بنجاح!');
+                        location.reload();
+                    } else {
+                        alert('ملف النسخة الاحتياطية غير صالح!');
+                    }
+                } catch(err) {
+                    alert('حدث خطأ في قراءة الملف!');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function addDepartment(e) {
+            e.preventDefault();
+            const val = document.getElementById('new-dept').value.trim();
+            if(val && !departments.includes(val)) {
+                departments.push(val);
+                saveData();
+                document.getElementById('new-dept').value = '';
+                renderAdminLists();
+                logAction(`إضافة تخصص: ${val}`);
+                alert('تمت إضافة التخصص بنجاح!');
+            }
+        }
+
+        function deleteDept(index) {
+            logAction(`حذف تخصص: ${departments[index]}`);
+            departments.splice(index, 1);
+            saveData();
+            renderAdminLists();
+        }
+
+        function addSupervisor(e) {
+            e.preventDefault();
+            const name = document.getElementById('sup-name').value;
+            const spec = document.getElementById('sup-spec').value;
+            supervisors.push({ name, spec });
+            saveData();
+            document.getElementById('sup-name').value = '';
+            document.getElementById('sup-spec').value = '';
+            renderAdminLists();
+            logAction(`إضافة مشرف: ${name}`);
+            alert('تمت إضافة المشرف بنجاح!');
+        }
+
+        function deleteSup(index) {
+            logAction(`حذف مشرف: ${supervisors[index].name}`);
+            supervisors.splice(index, 1);
+            saveData();
+            renderAdminLists();
+        }
+
+        function addAdminUser(e) {
+            e.preventDefault();
+            const user = document.getElementById('admin-name').value.trim();
+            const pass = document.getElementById('admin-pass').value.trim();
+            if(user && pass) {
+                admins.push({ user, pass });
+                saveData();
+                document.getElementById('admin-name').value = '';
+                document.getElementById('admin-pass').value = '';
+                renderAdminLists();
+                logAction(`إضافة حساب أدمن جديد: ${user}`);
+                alert('تمت إضافة الأدمن الجديد بنجاح!');
+            }
+        }
+
+        function deleteAdmin(index) {
+            if(admins.length <= 1) {
+                alert('لا يمكنك حذف جميع حسابات الأدمن!');
+                return;
+            }
+            logAction(`حذف أدمن: ${admins[index].user}`);
+            admins.splice(index, 1);
+            saveData();
+            renderAdminLists();
+        }
+
+        function renderAdminLists() {
+            const deptList = document.getElementById('admin-dept-list');
+            deptList.innerHTML = '';
+            departments.forEach((d, i) => {
+                deptList.innerHTML += `<div class="flex justify-between items-center bg-white p-2 rounded border text-xs"><span>${d}</span> <button onclick="deleteDept(${i})" class="text-red-500 font-bold">حذف</button></div>`;
+            });
+
+            const supList = document.getElementById('admin-sup-list');
+            supList.innerHTML = '';
+            supervisors.forEach((s, i) => {
+                supList.innerHTML += `<div class="flex justify-between items-center bg-white p-2 rounded border text-xs"><span>${s.name}</span> <button onclick="deleteSup(${i})" class="text-red-500 font-bold">حذف</button></div>`;
+            });
+
+            const adminList = document.getElementById('admin-users-list');
+            adminList.innerHTML = '';
+            admins.forEach((a, i) => {
+                adminList.innerHTML += `<div class="flex justify-between items-center bg-white p-2 rounded border text-xs"><span>${a.user}</span> <button onclick="deleteAdmin(${i})" class="text-red-500 font-bold">حذف</button></div>`;
+            });
+        }
+
+        function renderAuditLogs() {
+            const box = document.getElementById('audit-log-box');
+            box.innerHTML = '';
+            if(auditLogs.length === 0) {
+                box.innerHTML = `<p class="text-gray-400">لا توجد عمليات مسجلة بعد.</p>`;
+                return;
+            }
+            auditLogs.forEach(l => {
+                box.innerHTML += `<div><span class="text-blue-900 font-bold">[${l.time}]</span> ${l.action}</div>`;
+            });
+        }
+
+        function renderSupervisors() {
+            const grid = document.getElementById('supervisors-grid');
+            grid.innerHTML = '';
+            if(supervisors.length === 0) {
+                grid.innerHTML = `<p class="text-gray-400 text-sm">لا توجد أسماء مشرفين مضافة حالياً.</p>`;
+                return;
+            }
+            supervisors.forEach(s => {
+                grid.innerHTML += `<div class="border p-4 rounded-xl bg-gray-50"><h4 class="font-bold text-gray-800">${s.name}</h4><p class="text-xs text-gray-500 mt-1">التخصص: ${s.spec}</p></div>`;
+            });
+        }
+
+        function addDefenseSession(e) {
+            e.preventDefault();
+            defenseSessions.push({
+                title: document.getElementById('def-title').value,
+                head: document.getElementById('def-head').value,
+                date: document.getElementById('def-date').value,
+                hall: document.getElementById('def-hall').value
+            });
+            saveData();
+            logAction(`جدولة مناقشة: ${document.getElementById('def-title').value}`);
+            alert('تمت جدولة مناقشة البحث بنجاح!');
+        }
+
+        updateDashboardStats();
+        updateDropdowns();
+    </script>
+</body>
+</html>
