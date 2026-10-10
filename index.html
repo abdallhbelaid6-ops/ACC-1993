@@ -222,8 +222,16 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1">سنة التخرج (مثال: 2025/2026)</label>
+                        <label class="block text-sm font-medium mb-1">العام الدراسي (مثال: 2025/2026)</label>
                         <input type="text" id="reg-year" value="2025/2026" required class="w-full border rounded-lg p-2.5 text-sm outline-none font-bold text-blue-900">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">الفصل الدراسي</label>
+                        <select id="reg-term" class="w-full border rounded-lg p-2.5 text-sm outline-none font-semibold text-blue-900 bg-blue-50/50">
+                            <option value="فصل الخريف">فصل الخريف</option>
+                            <option value="فصل الربيع">فصل الربيع</option>
+                        </select>
                     </div>
 
                     <div class="md:col-span-2 border p-4 rounded-xl bg-gray-50 space-y-3">
@@ -301,7 +309,7 @@
                         <thead class="bg-gray-50 text-gray-700">
                             <tr>
                                 <th class="p-3">الطلبة وأرقامهم القيدية</th>
-                                <th class="p-3">التخصص / السنة</th>
+                                <th class="p-3">التخصص / العام / الفصل</th>
                                 <th class="p-3">عنوان البحث</th>
                                 <th class="p-3">المشرف</th>
                                 <th class="p-3">إجراء</th>
@@ -320,16 +328,40 @@
                 <div id="supervisors-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
-            <!-- REPORTS -->
+            <!-- REPORTS & TERM-BASED PRINTING -->
             <div id="tab-reports" class="tab-content hidden space-y-6 bg-white p-4 sm:p-6 rounded-2xl border border-gray-100">
                 <h2 class="text-lg sm:text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-chart-bar text-blue-900"></i> التقارير والطباعة الرسمية
+                    <i class="fa-solid fa-chart-bar text-blue-900"></i> التقارير والطباعة حسب الفصل الدراسي العام
                 </h2>
+                
+                <!-- لوحة اختيار الفصل والعام الدراسي للطباعة -->
+                <div class="bg-blue-50 border border-blue-200 p-5 rounded-2xl space-y-4">
+                    <h3 class="font-bold text-blue-950 text-base"><i class="fa-solid fa-filter ml-2"></i> طباعة تقارير البحوث المخصصة حسب الفصل الدراسي</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold mb-1 text-gray-700">اختر العام الدراسي</label>
+                            <input type="text" id="report-year-input" value="2025/2026" class="w-full border rounded-xl p-2.5 text-xs bg-white outline-none font-bold text-blue-900">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1 text-gray-700">اختر الفصل الدراسي</label>
+                            <select id="report-term-select" class="w-full border rounded-xl p-2.5 text-xs bg-white outline-none font-bold text-blue-900">
+                                <option value="فصل الخريف">فصل الخريف</option>
+                                <option value="فصل الربيع">فصل الربيع</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="printTermReport()" class="w-full bg-blue-900 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-blue-800 transition shadow">
+                                <i class="fa-solid fa-print ml-1"></i> طباعة تقرير هذا الفصل
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="border p-5 rounded-2xl bg-blue-50/50 space-y-3 flex flex-col justify-between">
                         <div>
                             <h3 class="font-bold text-blue-950 text-base">تقرير البحوث الجارية</h3>
-                            <p class="text-xs text-gray-600 mt-1">قائمة البحوث قيد الإنجاز مع أسماء الطلاب وأرقامهم القيدية.</p>
+                            <p class="text-xs text-gray-600 mt-1">قائمة البحوث قيد الإنجاز مع أسماء الطلاب والأرقام القيدية.</p>
                         </div>
                         <button onclick="printReport('current')" class="bg-blue-900 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-blue-800 transition shadow">
                             <i class="fa-solid fa-print ml-1"></i> طباعة تقرير البحوث الجارية
@@ -354,6 +386,31 @@
                         <button onclick="printReport('archive')" class="bg-amber-700 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-amber-800 transition shadow">
                             <i class="fa-solid fa-print ml-1"></i> طباعة تقرير الأرشيف
                         </button>
+                    </div>
+                </div>
+
+                <!-- قائمة تقارير النسخ الاحتياطي -->
+                <div class="border-2 border-amber-200 bg-amber-50/30 p-5 rounded-2xl space-y-4 mt-6">
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <div>
+                            <h3 class="font-bold text-amber-950 text-base"><i class="fa-solid fa-database ml-2"></i> قائمة تقارير وسجلات النسخ الاحتياطي (Backup Report List)</h3>
+                            <p class="text-xs text-gray-600 mt-0.5">استعراض تفصيلي لبيانات النظام المسجلة سحابياً وإمكانية طباعة تقرير النسخ الاحتياطي أو تصديره.</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="exportBackup()" class="bg-amber-700 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-amber-800 shadow">
+                                <i class="fa-solid fa-download ml-1"></i> تصدير ملف Backup
+                            </button>
+                            <button onclick="printBackupReport()" class="bg-blue-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-800 shadow">
+                                <i class="fa-solid fa-print ml-1"></i> طباعة تقرير النسخ
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="backup-report-summary" class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs font-bold">
+                        <div class="bg-white p-3 rounded-xl border shadow-2xs">التخصصات المسجلة: <span id="rep-dept-count" class="text-blue-900 font-black">0</span></div>
+                        <div class="bg-white p-3 rounded-xl border shadow-2xs">المشرفون: <span id="rep-sup-count" class="text-blue-900 font-black">0</span></div>
+                        <div class="bg-white p-3 rounded-xl border shadow-2xs">إجمالي البحوث: <span id="rep-res-count" class="text-blue-900 font-black">0</span></div>
+                        <div class="bg-white p-3 rounded-xl border shadow-2xs">العمليات (Logs): <span id="rep-log-count" class="text-blue-900 font-black">0</span></div>
                     </div>
                 </div>
             </div>
@@ -448,7 +505,6 @@
         window.dbSet = set;
         window.dbOnValue = onValue;
 
-        // ربط البيانات بالسحابة فورياً
         window.dbOnValue(window.dbRef(db, 'system_data'), (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -461,6 +517,7 @@
             }
             updateDashboardStats();
             updateDropdowns();
+            updateBackupReportStats();
             if(document.getElementById('tab-students').classList.contains('hidden') === false) renderStudents();
             if(document.getElementById('tab-supervisors').classList.contains('hidden') === false) renderSupervisors();
             if(document.getElementById('tab-admin-panel').classList.contains('hidden') === false) { renderAdminLists(); renderAuditLogs(); }
@@ -526,6 +583,7 @@
                 });
             }
             updateDashboardStats();
+            updateBackupReportStats();
         }
 
         function updateDashboardStats() {
@@ -533,6 +591,13 @@
             if(document.getElementById('stat-students')) document.getElementById('stat-students').innerText = researches.length * 2;
             if(document.getElementById('stat-approved')) document.getElementById('stat-approved').innerText = researches.filter(r => r.type === 'old').length;
             if(document.getElementById('stat-pending')) document.getElementById('stat-pending').innerText = researches.filter(r => r.type === 'new').length;
+        }
+
+        function updateBackupReportStats() {
+            if(document.getElementById('rep-dept-count')) document.getElementById('rep-dept-count').innerText = departments.length;
+            if(document.getElementById('rep-sup-count')) document.getElementById('rep-sup-count').innerText = supervisors.length;
+            if(document.getElementById('rep-res-count')) document.getElementById('rep-res-count').innerText = researches.length;
+            if(document.getElementById('rep-log-count')) document.getElementById('rep-log-count').innerText = auditLogs.length;
         }
 
         function switchTab(tabId) {
@@ -552,6 +617,7 @@
             if(tabId === 'register') updateDropdowns();
             if(tabId === 'students') renderStudents();
             if(tabId === 'supervisors') renderSupervisors();
+            if(tabId === 'reports') updateBackupReportStats();
             if(tabId === 'admin-panel') { renderAdminLists(); renderAuditLogs(); }
             if(tabId === 'home') updateDashboardStats();
         }
@@ -733,6 +799,7 @@
 
             const type = document.getElementById('reg-type').value;
             const year = document.getElementById('reg-year').value;
+            const term = document.getElementById('reg-term').value;
             const title = document.getElementById('reg-title').value;
             const major = document.getElementById('reg-major').value;
             const supervisor = document.getElementById('reg-supervisor').value;
@@ -748,9 +815,9 @@
                 }
             }
 
-            researches.push({ id: Date.now(), type, year, title, major, supervisor, students, pdfName, similarity: currentSimilarityResult.percentage });
+            researches.push({ id: Date.now(), type, year, term, title, major, supervisor, students, pdfName, similarity: currentSimilarityResult.percentage });
             saveData();
-            logAction(`تسجيل بحث جديد: ${title} بنسبة تشابه ${currentSimilarityResult.percentage}%`);
+            logAction(`تسجيل بحث جديد: ${title} (${term} - ${year})`);
             alert('تم تسجيل البحث بنجاح سحابياً!');
             document.getElementById('researchForm').reset();
             document.getElementById('reg-year').value = '2025/2026';
@@ -768,11 +835,12 @@
             }
             researches.forEach((r, index) => {
                 let studsHtml = r.students.map(s => `${s.name} (قيدي: ${s.id})`).join('<br>');
+                let termName = r.term || 'فصل الخريف';
                 let simBadge = r.similarity !== undefined ? `<br><span class="text-[10px] text-gray-500">نسبة التشابه: ${r.similarity}%</span>` : '';
                 tbody.innerHTML += `
                     <tr class="hover:bg-gray-50">
                         <td class="p-3 font-semibold text-xs">${studsHtml}</td>
-                        <td class="p-3 text-xs">${r.major}<br><span class="text-gray-400">سنة: ${r.year}</span></td>
+                        <td class="p-3 text-xs">${r.major}<br><span class="text-blue-900 font-bold">${termName} (${r.year})</span></td>
                         <td class="p-3 font-bold text-sm text-blue-950">${r.title} ${simBadge}</td>
                         <td class="p-3 text-xs">${r.supervisor}</td>
                         <td class="p-3"><button onclick="deleteResearch(${index})" class="bg-red-100 text-red-600 px-2.5 py-1 rounded text-xs font-bold hover:bg-red-200">حذف</button></td>
@@ -788,6 +856,70 @@
                 saveData();
                 renderStudents();
             }
+        }
+
+        // طباعة تقرير مخصص حسب الفصل الدراسي والعام الدراسي
+        function printTermReport() {
+            const selectedYear = document.getElementById('report-year-input').value.trim();
+            const selectedTerm = document.getElementById('report-term-select').value;
+
+            const filteredRes = researches.filter(r => r.year === selectedYear && (r.term === selectedTerm || (!r.term && selectedTerm === 'فصل الخريف')));
+
+            let htmlContent = `
+                <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 25px;">
+                    <div style="text-align: center; border-bottom: 2px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 20px;">
+                        <h2 style="color: #1e3a8a; margin: 0; font-size: 18px;">وزارة التعليم التقني العالي</h2>
+                        <h3 style="color: #111827; margin: 5px 0; font-size: 16px;">كلية العلوم والتقنية الزوية الشاطئ</h3>
+                        <h4 style="color: #4b5563; margin: 5px 0; font-size: 14px;">تقرير البحوث المسجلة لـ (${selectedTerm}) - العام الدراسي ${selectedYear}</h4>
+                        <p style="font-size: 11px; color: #6b7280;">تاريخ الإصدار: ${new Date().toLocaleString('ar-LY')}</p>
+                    </div>
+            `;
+
+            if(filteredRes.length === 0) {
+                htmlContent += `<p style="text-align: center; color: #6b7280; font-size: 14px; padding: 20px;">لا توجد بحوث مسجلة في (${selectedTerm}) للعام الدراسي (${selectedYear}).</p>`;
+            } else {
+                htmlContent += `
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;" border="1">
+                        <tr style="background: #f3f4f6;">
+                            <th style="padding: 8px;">الطلاب والأرقام القيدية</th>
+                            <th style="padding: 8px;">التخصص</th>
+                            <th style="padding: 8px;">عنوان البحث</th>
+                            <th style="padding: 8px;">المشرف</th>
+                        </tr>
+                `;
+                filteredRes.forEach(r => {
+                    let st = r.students.map(s => `${s.name} (${s.id})`).join('<br>');
+                    htmlContent += `
+                        <tr>
+                            <td style="padding: 8px;">${st}</td>
+                            <td style="padding: 8px;">${r.major}</td>
+                            <td style="padding: 8px; font-weight: bold;">${r.title}</td>
+                            <td style="padding: 8px;">${r.supervisor}</td>
+                        </tr>
+                    `;
+                });
+                htmlContent += `</table>`;
+            }
+
+            htmlContent += `
+                <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 13px;">
+                    <div>
+                        <p><b>قسم الدراسات والامتحانات / وحدة البحوث:</b></p>
+                        <p style="margin-top: 25px;">التوقيع: ............................</p>
+                    </div>
+                    <div>
+                        <p><b>اعتماد الكلية:</b></p>
+                        <p style="margin-top: 25px;">الختم والتاريخ: ............................</p>
+                    </div>
+                </div>
+            </div>`;
+
+            const printWin = window.open('', '', 'height=600,width=800');
+            printWin.document.write(htmlContent);
+            printWin.document.close();
+            printWin.focus();
+            setTimeout(() => { printWin.print(); printWin.close(); }, 500);
+            logAction(`طباعة تقرير ${selectedTerm} للعام ${selectedYear}`);
         }
 
         function printReport(type) {
@@ -810,10 +942,10 @@
                     htmlContent += `<p style="text-align: center; color: #6b7280;">لا توجد بحوث جارية مسجلة حالياً.</p>`;
                 } else {
                     htmlContent += `<table style="width: 100%; border-collapse: collapse; font-size: 12px;" border="1">
-                        <tr style="background: #f3f4f6;"><th style="padding: 8px;">الطلاب والأرقام القيدية</th><th style="padding: 8px;">التخصص وسنة التخرج</th><th style="padding: 8px;">عنوان البحث</th><th style="padding: 8px;">المشرف</th></tr>`;
+                        <tr style="background: #f3f4f6;"><th style="padding: 8px;">الطلاب والأرقام القيدية</th><th style="padding: 8px;">الفصل / السنة / التخصص</th><th style="padding: 8px;">عنوان البحث</th><th style="padding: 8px;">المشرف</th></tr>`;
                     currentRes.forEach(r => {
                         let st = r.students.map(s => `${s.name} (${s.id})`).join('<br>');
-                        htmlContent += `<tr><td style="padding: 8px;">${st}</td><td style="padding: 8px;">${r.major} (${r.year})</td><td style="padding: 8px; font-weight: bold;">${r.title}</td><td style="padding: 8px;">${r.supervisor}</td></tr>`;
+                        htmlContent += `<tr><td style="padding: 8px;">${st}</td><td style="padding: 8px;">${r.term || 'فصل الخريف'} (${r.year})<br>${r.major}</td><td style="padding: 8px; font-weight: bold;">${r.title}</td><td style="padding: 8px;">${r.supervisor}</td></tr>`;
                     });
                     htmlContent += `</table>`;
                 }
@@ -834,10 +966,10 @@
                     htmlContent += `<p style="text-align: center; color: #6b7280;">لا توجد بحوث مؤرشفة سابقة.</p>`;
                 } else {
                     htmlContent += `<table style="width: 100%; border-collapse: collapse; font-size: 12px;" border="1">
-                        <tr style="background: #f3f4f6;"><th style="padding: 8px;">الطلاب</th><th style="padding: 8px;">السنة</th><th style="padding: 8px;">عنوان البحث</th><th style="padding: 8px;">المشرف</th></tr>`;
+                        <tr style="background: #f3f4f6;"><th style="padding: 8px;">الطلاب</th><th style="padding: 8px;">الفصل / السنة</th><th style="padding: 8px;">عنوان البحث</th><th style="padding: 8px;">المشرف</th></tr>`;
                     oldRes.forEach(r => {
                         let st = r.students.map(s => `${s.name}`).join(', ');
-                        htmlContent += `<tr><td style="padding: 8px;">${st}</td><td style="padding: 8px;">${r.year}</td><td style="padding: 8px; font-weight: bold;">${r.title}</td><td style="padding: 8px;">${r.supervisor}</td></tr>`;
+                        htmlContent += `<tr><td style="padding: 8px;">${st}</td><td style="padding: 8px;">${r.term || 'فصل الخريف'} (${r.year})</td><td style="padding: 8px; font-weight: bold;">${r.title}</td><td style="padding: 8px;">${r.supervisor}</td></tr>`;
                     });
                     htmlContent += `</table>`;
                 }
@@ -852,6 +984,49 @@
             logAction(`طباعة تقرير: ${type}`);
         }
 
+        function printBackupReport() {
+            let htmlContent = `
+                <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 25px;">
+                    <div style="text-align: center; border-bottom: 2px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 20px;">
+                        <h2 style="color: #1e3a8a; margin: 0; font-size: 18px;">وزارة التعليم التقني العالي</h2>
+                        <h3 style="color: #111827; margin: 5px 0; font-size: 16px;">كلية العلوم والتقنية الزوية الشاطئ</h3>
+                        <h4 style="color: #4b5563; margin: 5px 0; font-size: 14px;">تقرير حالة النسخ الاحتياطي السحابي (System Backup Report)</h4>
+                        <p style="font-size: 12px; color: #6b7280;">تاريخ التقرير: ${new Date().toLocaleString('ar-LY')}</p>
+                    </div>
+
+                    <div style="margin-bottom: 20px; font-size: 14px; line-height: 2;">
+                        <p><b>إجمالي التخصصات المضافة:</b> ${departments.length}</p>
+                        <p><b>إجمالي المشرفين المسجلين:</b> ${supervisors.length}</p>
+                        <p><b>إجمالي البحوث والأبحاث (أرشيف وجارية):</b> ${researches.length}</p>
+                        <p><b>عدد العمليات والسجلات الزمنية (Audit Logs):</b> ${auditLogs.length}</p>
+                    </div>
+
+                    <h4 style="color: #1e3a8a; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px;">آخر السجلات والعمليات المنفذة:</h4>
+                    <ul style="font-size: 12px; line-height: 1.8;">
+                        ${auditLogs.slice(0, 10).map(l => `<li>[<b>${l.time}</b>] -${l.action}</li>`).join('')}
+                    </ul>
+
+                    <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 13px;">
+                        <div>
+                            <p><b>مدير النظام / وحدة البحوث:</b></p>
+                            <p style="margin-top: 25px;">التوقيع: ............................</p>
+                        </div>
+                        <div>
+                            <p><b>اعتماد الإدارة:</b></p>
+                            <p style="margin-top: 25px;">الختم والتاريخ: ............................</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const printWin = window.open('', '', 'height=600,width=800');
+            printWin.document.write(htmlContent);
+            printWin.document.close();
+            printWin.focus();
+            setTimeout(() => { printWin.print(); printWin.close(); }, 500);
+            logAction('طباعة تقرير النسخ الاحتياطي السحابي');
+        }
+
         function exportBackup() {
             const backupData = { departments, supervisors, admins, researches, defenseSessions, auditLogs };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
@@ -861,7 +1036,7 @@
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();
-            logAction('تصدير نسخة احتياطية سحابية');
+            logAction('تصدير نسخة احتياطية سحابية (Backup)');
         }
 
         function importBackup(e) {
