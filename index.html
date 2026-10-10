@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منظومة بحوث التخرج - كلية العلوم والتقنية الشاطئ</title>
+    <title>منظومة بحوث التخرج - كلية العلوم والتقنية الزوية الشاطئ</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -11,17 +11,17 @@
         body { font-family: 'Cairo', sans-serif; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 flex h-screen overflow-hidden">
+<body class="bg-gray-100 text-gray-800 flex flex-col md:flex-row h-screen overflow-hidden">
 
     <!-- شاشة تسجيل الدخول العامة -->
     <div id="login-modal" class="fixed inset-0 bg-blue-950/80 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6">
+        <div class="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6">
             <div class="text-center space-y-2">
                 <div class="bg-blue-100 text-blue-900 w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-2xl font-bold">
                     <i class="fa-solid fa-graduation-cap"></i>
                 </div>
                 <h2 class="text-xl font-black text-gray-800">تسجيل الدخول للمنظومة</h2>
-                <p class="text-xs text-gray-500">وزارة التعليم التقني العالي - كلية العلوم والتقنية الشاطئ</p>
+                <p class="text-xs text-gray-500">وزارة التعليم التقني العالي - كلية العلوم والتقنية الزوية الشاطئ</p>
             </div>
             <form onsubmit="handleGeneralLogin(event)" class="space-y-4">
                 <div>
@@ -39,15 +39,15 @@
         </div>
     </div>
 
-    <!-- نافذة دخول لوحة الإدارة بكلمة مرور -->
+    <!-- نافذة دخول لوحة الإدارة بكلمة مرور مخفية -->
     <div id="admin-login-modal" class="fixed inset-0 bg-gray-950/80 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6">
+        <div class="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6">
             <div class="text-center space-y-2">
                 <div class="bg-amber-100 text-amber-800 w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-2xl font-bold">
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h2 class="text-xl font-black text-gray-800">دخول لوحة الإدارة المحمية</h2>
-                <p class="text-xs text-gray-500">الرقم السري الافتراضي: 1234 (أو كلمة مرور الأدمن المضاف)</p>
+                <p class="text-xs text-gray-500">الرجاء إدخال كلمة مرور الإدارة للمتابعة</p>
             </div>
             <form onsubmit="verifyAdminPassword(event)" class="space-y-4">
                 <div>
@@ -62,42 +62,55 @@
         </div>
     </div>
 
-    <!-- Sidebar (القائمة الجانبية) -->
-    <aside class="w-64 bg-blue-950 text-white flex flex-col justify-between hidden md:flex shrink-0">
+    <!-- نافذة معاينة الفحص قبل الطباعة -->
+    <div id="preview-modal" class="fixed inset-0 bg-gray-950/80 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="text-center border-b pb-3">
+                <h3 class="font-black text-blue-950 text-base">معاينة وثيقة فحص التشابه وحالة البحث</h3>
+                <p class="text-xs text-gray-500">كلية العلوم والتقنية الزوية الشاطئ</p>
+            </div>
+            <div id="preview-content" class="space-y-3 text-xs sm:text-sm bg-gray-50 p-4 rounded-xl border"></div>
+            <div class="flex gap-2 pt-2">
+                <button type="button" onclick="document.getElementById('preview-modal').classList.add('hidden')" class="w-1/2 bg-gray-200 text-gray-700 py-2.5 rounded-xl font-bold text-xs">إغلاق المعاينة</button>
+                <button type="button" onclick="confirmPrintCertificate()" class="w-1/2 bg-purple-700 text-white py-2.5 rounded-xl font-bold text-xs hover:bg-purple-800"><i class="fa-solid fa-print ml-1"></i> طباعة الوثيقة نهائياً</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="w-full md:w-64 bg-blue-950 text-white flex flex-col justify-between shrink-0 shadow-lg">
         <div>
-            <div class="p-5 border-b border-blue-900 flex items-center gap-3">
-                <div class="bg-blue-800 p-2 rounded-xl text-white text-xl">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                </div>
+            <div class="p-4 sm:p-5 border-b border-blue-900 flex items-center gap-3">
+                <img src="logo.png" alt="شعار الكلية" class="w-11 h-11 object-contain rounded-xl bg-white p-1 shadow shrink-0">
                 <div>
-                    <h1 class="font-black text-sm">منظومة بحوث التخرج</h1>
-                    <p class="text-[10px] text-blue-300">كلية العلوم والتقنية الشاطئ</p>
+                    <h1 class="font-black text-xs sm:text-sm leading-tight">منظومة بحوث التخرج</h1>
+                    <p class="text-[9px] sm:text-[10px] text-blue-300">كلية العلوم والتقنية الزوية الشاطئ</p>
                 </div>
             </div>
 
-            <nav class="p-3 space-y-1 text-sm font-medium">
-                <button onclick="switchTab('home')" id="nav-home" class="w-full text-right px-4 py-3 rounded-xl bg-blue-900 text-white flex items-center gap-3 transition">
+            <nav class="p-2 sm:p-3 flex md:flex-col gap-1 overflow-x-auto md:overflow-visible text-xs sm:text-sm font-medium">
+                <button onclick="switchTab('home')" id="nav-home" class="whitespace-nowrap w-full text-right px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-blue-900 text-white flex items-center gap-3 transition">
                     <i class="fa-solid fa-house w-5"></i> الرئيسية
                 </button>
-                <button onclick="switchTab('register')" id="nav-register" class="w-full text-right px-4 py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
+                <button onclick="switchTab('register')" id="nav-register" class="whitespace-nowrap w-full text-right px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
                     <i class="fa-solid fa-file-circle-plus w-5"></i> تسجيل بحوث جديدة
                 </button>
-                <button onclick="switchTab('students')" id="nav-students" class="w-full text-right px-4 py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
+                <button onclick="switchTab('students')" id="nav-students" class="whitespace-nowrap w-full text-right px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
                     <i class="fa-solid fa-book w-5"></i> قائمة البحوث والطلبة
                 </button>
-                <button onclick="switchTab('supervisors')" id="nav-supervisors" class="w-full text-right px-4 py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
+                <button onclick="switchTab('supervisors')" id="nav-supervisors" class="whitespace-nowrap w-full text-right px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
                     <i class="fa-solid fa-chalkboard-user w-5"></i> قائمة المشرفين
                 </button>
-                <button onclick="openAdminPanelCheck()" id="nav-admin-panel" class="w-full text-right px-4 py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
+                <button onclick="openAdminPanelCheck()" id="nav-admin-panel" class="whitespace-nowrap w-full text-right px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
                     <i class="fa-solid fa-gears w-5"></i> لوحة الإدارة
                 </button>
-                <button onclick="switchTab('reports')" id="nav-reports" class="w-full text-right px-4 py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
-                    <i class="fa-solid fa-chart-bar w-5"></i> التقارير والإحصائيات
+                <button onclick="switchTab('reports')" id="nav-reports" class="whitespace-nowrap w-full text-right px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-blue-200 hover:bg-blue-900/50 flex items-center gap-3 transition">
+                    <i class="fa-solid fa-chart-bar w-5"></i> التقارير والطباعة
                 </button>
             </nav>
         </div>
 
-        <div class="p-4 border-t border-blue-900 text-xs text-blue-300 text-center">
+        <div class="hidden md:block p-4 border-t border-blue-900 text-xs text-blue-300 text-center">
             وزارة التعليم التقني العالي
         </div>
     </aside>
@@ -105,29 +118,29 @@
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col h-screen overflow-y-auto">
         
-        <header class="bg-white shadow-xs px-6 py-3 flex justify-between items-center shrink-0">
+        <header class="bg-white shadow-xs px-4 sm:px-6 py-3 flex justify-between items-center shrink-0">
             <div class="flex items-center gap-3">
-                <span class="font-bold text-gray-700 text-sm">وزارة التعليم التقني العالي — كلية العلوم والتقنية الشاطئ</span>
+                <span class="font-bold text-gray-700 text-xs sm:text-sm">كلية العلوم والتقنية الزوية الشاطئ</span>
             </div>
             <div class="flex items-center gap-3">
                 <div class="text-right">
                     <h4 class="font-bold text-xs text-gray-800">أ. عبدالله أمحمد بلعيد لسود</h4>
                     <p class="text-[10px] text-gray-500">مدير النظام</p>
                 </div>
-                <div class="bg-blue-100 text-blue-900 w-9 h-9 rounded-full flex items-center justify-center font-bold">
+                <div class="bg-blue-100 text-blue-900 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-bold text-xs">
                     <i class="fa-solid fa-user"></i>
                 </div>
             </div>
         </header>
 
-        <main class="p-6 space-y-6 flex-1">
+        <main class="p-4 sm:p-6 space-y-6 flex-1">
             
             <!-- HOME -->
             <div id="tab-home" class="tab-content space-y-6">
-                <div class="bg-blue-50 border border-blue-100 p-6 rounded-2xl flex justify-between items-center shadow-xs">
+                <div class="bg-blue-50 border border-blue-100 p-5 sm:p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center shadow-xs gap-4">
                     <div>
-                        <h2 class="text-2xl font-black text-blue-950">مرحباً بك في منظومة بحوث التخرج</h2>
-                        <p class="text-xs text-blue-700 mt-1">إدارة وتنظيم بحوث التخرج بكل سهولة وفاعلية — كلية العلوم والتقنية الشاطئ</p>
+                        <h2 class="text-xl sm:text-2xl font-black text-blue-950">مرحباً بك في منظومة بحوث التخرج السحابية</h2>
+                        <p class="text-xs text-blue-700 mt-1">مزامنة فورية للبيانات عبر جميع الأجهزة - كلية العلوم والتقنية الزوية الشاطئ</p>
                     </div>
                 </div>
 
@@ -172,33 +185,33 @@
                 <div class="space-y-3">
                     <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2"><i class="fa-solid fa-grid-2 text-blue-900"></i> أقسام المنظومة</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div onclick="switchTab('register')" class="bg-blue-600 text-white p-6 rounded-2xl shadow-sm cursor-pointer hover:bg-blue-700 transition space-y-4">
+                        <div onclick="switchTab('register')" class="bg-blue-600 text-white p-5 sm:p-6 rounded-2xl shadow-sm cursor-pointer hover:bg-blue-700 transition space-y-4">
                             <div class="flex justify-between items-center"><i class="fa-solid fa-file-circle-plus text-2xl"></i> <i class="fa-solid fa-arrow-left"></i></div>
-                            <div><h4 class="font-bold text-lg">تسجيل بحوث جديدة</h4><p class="text-xs text-blue-100 mt-1">إضافة بحث جديد مع فحص التشابه الدقيق</p></div>
+                            <div><h4 class="font-bold text-base sm:text-lg">تسجيل بحوث جديدة</h4><p class="text-xs text-blue-100 mt-1">فحص التشابه والتحقق الفوري</p></div>
                         </div>
 
-                        <div onclick="switchTab('students')" class="bg-emerald-600 text-white p-6 rounded-2xl shadow-sm cursor-pointer hover:bg-emerald-700 transition space-y-4">
+                        <div onclick="switchTab('students')" class="bg-emerald-600 text-white p-5 sm:p-6 rounded-2xl shadow-sm cursor-pointer hover:bg-emerald-700 transition space-y-4">
                             <div class="flex justify-between items-center"><i class="fa-solid fa-book text-2xl"></i> <i class="fa-solid fa-arrow-left"></i></div>
-                            <div><h4 class="font-bold text-lg">قائمة البحوث والطلبة</h4><p class="text-xs text-emerald-100 mt-1">عرض وتصفية بيانات الأبحاث المسجلة</p></div>
+                            <div><h4 class="font-bold text-base sm:text-lg">قائمة البحوث والطلبة</h4><p class="text-xs text-emerald-100 mt-1">عرض الأبحاث المسجلة</p></div>
                         </div>
 
-                        <div onclick="switchTab('supervisors')" class="bg-purple-600 text-white p-6 rounded-2xl shadow-sm cursor-pointer hover:bg-purple-700 transition space-y-4">
+                        <div onclick="switchTab('supervisors')" class="bg-purple-600 text-white p-5 sm:p-6 rounded-2xl shadow-sm cursor-pointer hover:bg-purple-700 transition space-y-4">
                             <div class="flex justify-between items-center"><i class="fa-solid fa-chalkboard-user text-2xl"></i> <i class="fa-solid fa-arrow-left"></i></div>
-                            <div><h4 class="font-bold text-lg">قائمة المشرفين</h4><p class="text-xs text-purple-100 mt-1">عرض بيانات المشرفين وأقسامهم</p></div>
+                            <div><h4 class="font-bold text-base sm:text-lg">قائمة المشرفين</h4><p class="text-xs text-purple-100 mt-1">أعضاء هيئة التدريس</p></div>
                         </div>
 
-                        <div onclick="openAdminPanelCheck()" class="bg-cyan-700 text-white p-6 rounded-2xl shadow-sm cursor-pointer hover:bg-cyan-800 transition space-y-4">
+                        <div onclick="openAdminPanelCheck()" class="bg-cyan-700 text-white p-5 sm:p-6 rounded-2xl shadow-sm cursor-pointer hover:bg-cyan-800 transition space-y-4">
                             <div class="flex justify-between items-center"><i class="fa-solid fa-gears text-2xl"></i> <i class="fa-solid fa-arrow-left"></i></div>
-                            <div><h4 class="font-bold text-lg">لوحة الإدارة</h4><p class="text-xs text-cyan-100 mt-1">إدارة النظام وإضافة الأدمن</p></div>
+                            <div><h4 class="font-bold text-base sm:text-lg">لوحة الإدارة</h4><p class="text-xs text-cyan-100 mt-1">التحكم المركزي بالمنظومة</p></div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- REGISTER -->
-            <div id="tab-register" class="tab-content hidden space-y-6 bg-white p-6 rounded-2xl border border-gray-100">
-                <h2 class="text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-file-circle-plus text-blue-900"></i> تسجيل بحث تخرج جديد وفحص التشابه الذكي
+            <div id="tab-register" class="tab-content hidden space-y-6 bg-white p-4 sm:p-6 rounded-2xl border border-gray-100">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-file-circle-plus text-blue-900"></i> تسجيل بحث تخرج جديد مع الفحص الذكي للتشابه
                 </h2>
                 <form id="researchForm" onsubmit="submitResearch(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -214,22 +227,22 @@
                     </div>
 
                     <div class="md:col-span-2 border p-4 rounded-xl bg-gray-50 space-y-3">
-                        <label class="block text-sm font-bold text-gray-700"><i class="fa-solid fa-user-group text-blue-900 ml-1"></i> بيانات الطلاب (الاسم والرقم القيدي - الحد الأقصى 4 طلاب)</label>
+                        <label class="block text-sm font-bold text-gray-700"><i class="fa-solid fa-user-group text-blue-900 ml-1"></i> بيانات الطلاب (الاسم والرقم القيدي - حتى 4 طلاب)</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div class="flex gap-2">
-                                <input type="text" id="s1-name" placeholder="اسم الطالب الأول" required class="flex-1 border rounded-lg p-2 text-sm bg-white outline-none">
+                                <input type="text" id="s1-name" placeholder="الطالب الأول" required class="flex-1 border rounded-lg p-2 text-sm bg-white outline-none">
                                 <input type="text" id="s1-id" placeholder="الرقم القيدي" required class="w-28 border rounded-lg p-2 text-sm bg-white outline-none">
                             </div>
                             <div class="flex gap-2">
-                                <input type="text" id="s2-name" placeholder="اسم الطالب الثاني (اختياري)" class="flex-1 border rounded-lg p-2 text-sm bg-white outline-none">
+                                <input type="text" id="s2-name" placeholder="الطالب الثاني (اختياري)" class="flex-1 border rounded-lg p-2 text-sm bg-white outline-none">
                                 <input type="text" id="s2-id" placeholder="الرقم القيدي" class="w-28 border rounded-lg p-2 text-sm bg-white outline-none">
                             </div>
                             <div class="flex gap-2">
-                                <input type="text" id="s3-name" placeholder="اسم الطالب الثالث (اختياري)" class="flex-1 border rounded-lg p-2 text-sm bg-white outline-none">
+                                <input type="text" id="s3-name" placeholder="الطالب الثالث (اختياري)" class="flex-1 border rounded-lg p-2 text-sm bg-white outline-none">
                                 <input type="text" id="s3-id" placeholder="الرقم القيدي" class="w-28 border rounded-lg p-2 text-sm bg-white outline-none">
                             </div>
                             <div class="flex gap-2">
-                                <input type="text" id="s4-name" placeholder="اسم الطالب الرابع (اختياري)" class="flex-1 border rounded-lg p-2 text-sm bg-white outline-none">
+                                <input type="text" id="s4-name" placeholder="الطالب الرابع (اختياري)" class="flex-1 border rounded-lg p-2 text-sm bg-white outline-none">
                                 <input type="text" id="s4-id" placeholder="الرقم القيدي" class="w-28 border rounded-lg p-2 text-sm bg-white outline-none">
                             </div>
                         </div>
@@ -244,16 +257,16 @@
                         <select id="reg-supervisor" class="w-full border rounded-lg p-2.5 text-sm outline-none font-semibold text-blue-900 bg-blue-50/50"></select>
                     </div>
 
-                    <!-- خانة مستقلة خاصة بفحص التشابه الذكي -->
+                    <!-- خانة مستقلة لفحص التشابه الذكي -->
                     <div class="md:col-span-2 border-2 border-blue-200 bg-blue-50/40 p-4 rounded-xl space-y-3">
                         <label class="block text-sm font-bold text-blue-950 flex items-center gap-2">
-                            <i class="fa-solid fa-magnifying-glass-chart"></i> خانة فحص التشابه الذكي لعنوان البحث
+                            <i class="fa-solid fa-magnifying-glass-chart"></i> خانة فحص التشابه الذكي (العنوان وأسماء الطلاب)
                         </label>
-                        <p class="text-xs text-gray-600">قم بكتابة أو لصق عنوان البحث هنا لفحصه فوريًا ومقارنته مع الأبحاث المسجلة وملاحظة نسبة التشابه:</p>
+                        <p class="text-xs text-gray-600">اكتب العنوان أو أدخل أسماء الطلاب للفحص الفوري ومقارنتها بالمنظومة وسحب نسبة التشابه:</p>
                         
-                        <input type="text" id="reg-title" oninput="checkTitleSimilarity(this.value)" required class="w-full border rounded-xl p-3 text-sm bg-white outline-none font-bold" placeholder="أدخل عنوان البحث للفحص والتسجيل...">
+                        <input type="text" id="reg-title" oninput="triggerSimilarityCheck()" required class="w-full border rounded-xl p-3 text-sm bg-white outline-none font-bold" placeholder="أدخل عنوان البحث لفحصه وسحب النسبة...">
 
-                        <!-- صندوق ظهور تفاصيل ونسبة التشابه -->
+                        <!-- صندوق نتيجة فحص التشابه -->
                         <div id="similarity-box" class="hidden p-3 rounded-xl border text-xs space-y-2">
                             <div class="flex justify-between items-center font-bold">
                                 <span id="similarity-status-text">نتيجة فحص التشابه:</span>
@@ -267,24 +280,24 @@
                         <label class="block text-sm font-medium mb-1">رفع ملف البحث (PDF)</label>
                         <input type="file" id="reg-pdf-file" accept=".pdf" class="w-full border rounded-lg p-2 text-sm bg-gray-50">
                     </div>
-                    <div class="md:col-span-2 flex gap-3">
-                        <button type="submit" id="submit-btn" class="flex-1 bg-blue-900 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-800 transition shadow-sm">
+                    <div class="md:col-span-2 flex flex-col sm:flex-row gap-3">
+                        <button type="submit" id="submit-btn" class="flex-1 bg-blue-900 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-800 transition shadow-sm text-sm">
                             <i class="fa-solid fa-check ml-1"></i> حفظ وتسجيل البحث
                         </button>
-                        <button type="button" onclick="printSimilarityCertificate()" class="bg-purple-700 text-white px-5 py-3 rounded-xl font-semibold hover:bg-purple-800 transition shadow-sm">
-                            <i class="fa-solid fa-print ml-1"></i> طباعة وثيقة فحص التشابه
+                        <button type="button" onclick="previewSimilarityCertificate()" class="bg-purple-700 text-white px-5 py-3 rounded-xl font-semibold hover:bg-purple-800 transition shadow-sm text-sm">
+                            <i class="fa-solid fa-eye ml-1"></i> معاينة وثيقة الفحص قبل الطباعة
                         </button>
                     </div>
                 </form>
             </div>
 
             <!-- STUDENTS / RESEARCH LIST -->
-            <div id="tab-students" class="tab-content hidden space-y-6 bg-white p-6 rounded-2xl border border-gray-100">
-                <h2 class="text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
+            <div id="tab-students" class="tab-content hidden space-y-6 bg-white p-4 sm:p-6 rounded-2xl border border-gray-100">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
                     <i class="fa-solid fa-book text-blue-900"></i> قائمة البحوث والطلبة المسجلين
                 </h2>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-right text-sm">
+                    <table class="w-full text-right text-sm min-w-[600px]">
                         <thead class="bg-gray-50 text-gray-700">
                             <tr>
                                 <th class="p-3">الطلبة وأرقامهم القيدية</th>
@@ -300,16 +313,16 @@
             </div>
 
             <!-- SUPERVISORS -->
-            <div id="tab-supervisors" class="tab-content hidden space-y-6 bg-white p-6 rounded-2xl border border-gray-100">
-                <h2 class="text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
+            <div id="tab-supervisors" class="tab-content hidden space-y-6 bg-white p-4 sm:p-6 rounded-2xl border border-gray-100">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
                     <i class="fa-solid fa-chalkboard-user text-blue-900"></i> قائمة أعضاء هيئة التدريس والمشرفين
                 </h2>
                 <div id="supervisors-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
             <!-- REPORTS -->
-            <div id="tab-reports" class="tab-content hidden space-y-6 bg-white p-6 rounded-2xl border border-gray-100">
-                <h2 class="text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
+            <div id="tab-reports" class="tab-content hidden space-y-6 bg-white p-4 sm:p-6 rounded-2xl border border-gray-100">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800 border-b pb-3 flex items-center gap-2">
                     <i class="fa-solid fa-chart-bar text-blue-900"></i> التقارير والطباعة الرسمية
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -346,13 +359,13 @@
             </div>
 
             <!-- ADMIN PANEL -->
-            <div id="tab-admin-panel" class="tab-content hidden space-y-6 bg-white p-6 rounded-2xl border border-gray-100">
-                <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex justify-between items-center">
+            <div id="tab-admin-panel" class="tab-content hidden space-y-6 bg-white p-4 sm:p-6 rounded-2xl border border-gray-100">
+                <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
-                        <h2 class="text-xl font-bold text-amber-950"><i class="fa-solid fa-gears ml-2"></i> لوحة الإدارة والتحكم المركزي</h2>
-                        <p class="text-xs text-amber-800 mt-1">إدارة التخصصات، المشرفين، إضافة الأدمن، والنسخ الاحتياطي.</p>
+                        <h2 class="text-lg sm:text-xl font-bold text-amber-950"><i class="fa-solid fa-gears ml-2"></i> لوحة الإدارة والتحكم المركزي السحابي</h2>
+                        <p class="text-xs text-amber-800 mt-1">إدارة التخصصات، المشرفين، حسابات الأدمن، والنسخ الاحتياطي.</p>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2">
                         <button onclick="exportBackup()" class="bg-amber-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-amber-800"><i class="fa-solid fa-download ml-1"></i> تصدير Backup</button>
                         <label class="bg-blue-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 cursor-pointer">
                             <i class="fa-solid fa-upload ml-1"></i> استعادة Backup <input type="file" id="import-file" onchange="importBackup(event)" class="hidden" accept=".json">
@@ -360,7 +373,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
                     <div class="border p-4 rounded-xl space-y-3 bg-gray-50">
                         <h3 class="font-bold text-gray-800 border-b pb-2 text-sm"><i class="fa-solid fa-sitemap text-blue-900 ml-1"></i> التخصصات</h3>
                         <form onsubmit="addDepartment(event)" class="space-y-2">
@@ -411,14 +424,15 @@
         </main>
     </div>
 
-    <!-- Firebase SDK Scripts -->
+    <!-- Firebase Realtime Database SDK & Sync Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA7uvicRiGGgvTKjyfVKr3MofuO1gwof6c",
             authDomain: "acc-1993.firebaseapp.com",
+            databaseURL: "https://acc-1993-default-rtdb.firebaseio.com",
             projectId: "acc-1993",
             storageBucket: "acc-1993.firebasestorage.app",
             messagingSenderId: "468585162756",
@@ -427,23 +441,46 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+
+        window.db = db;
+        window.dbRef = ref;
+        window.dbSet = set;
+        window.dbOnValue = onValue;
+
+        // ربط البيانات بالسحابة فورياً
+        window.dbOnValue(window.dbRef(db, 'system_data'), (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                departments = data.departments || [];
+                supervisors = data.supervisors || [];
+                admins = data.admins || [{user: "admin", pass: "1234"}];
+                researches = data.researches || [];
+                defenseSessions = data.defenseSessions || [];
+                auditLogs = data.auditLogs || [];
+            }
+            updateDashboardStats();
+            updateDropdowns();
+            if(document.getElementById('tab-students').classList.contains('hidden') === false) renderStudents();
+            if(document.getElementById('tab-supervisors').classList.contains('hidden') === false) renderSupervisors();
+            if(document.getElementById('tab-admin-panel').classList.contains('hidden') === false) { renderAdminLists(); renderAuditLogs(); }
+        });
     </script>
 
     <script>
-        let departments = JSON.parse(localStorage.getItem('zs_depts')) || [];
-        let supervisors = JSON.parse(localStorage.getItem('zs_sups')) || [];
-        let admins = JSON.parse(localStorage.getItem('zs_admins')) || [{user: "admin", pass: "1234"}];
-        let researches = JSON.parse(localStorage.getItem('zs_res')) || [];
-        let defenseSessions = JSON.parse(localStorage.getItem('zs_defs')) || [];
-        let auditLogs = JSON.parse(localStorage.getItem('zs_logs')) || [];
+        let departments = [];
+        let supervisors = [];
+        let admins = [{user: "admin", pass: "1234"}];
+        let researches = [];
+        let defenseSessions = [];
+        let auditLogs = [];
 
         let currentSimilarityResult = { percentage: 0, status: 'مقبول', matchTitle: 'لا يوجد' };
 
         function logAction(action) {
             const time = new Date().toLocaleString('ar-LY');
             auditLogs.unshift({ action, time });
-            localStorage.setItem('zs_logs', JSON.stringify(auditLogs));
+            saveData();
         }
 
         function handleGeneralLogin(e) {
@@ -478,19 +515,24 @@
         }
 
         function saveData() {
-            localStorage.setItem('zs_depts', JSON.stringify(departments));
-            localStorage.setItem('zs_sups', JSON.stringify(supervisors));
-            localStorage.setItem('zs_admins', JSON.stringify(admins));
-            localStorage.setItem('zs_res', JSON.stringify(researches));
-            localStorage.setItem('zs_defs', JSON.stringify(defenseSessions));
+            if (window.db && window.dbSet && window.dbRef) {
+                window.dbSet(window.dbRef(window.db, 'system_data'), {
+                    departments,
+                    supervisors,
+                    admins,
+                    researches,
+                    defenseSessions,
+                    auditLogs
+                });
+            }
             updateDashboardStats();
         }
 
         function updateDashboardStats() {
-            document.getElementById('stat-sups').innerText = supervisors.length;
-            document.getElementById('stat-students').innerText = researches.length * 2;
-            document.getElementById('stat-approved').innerText = researches.filter(r => r.type === 'old').length;
-            document.getElementById('stat-pending').innerText = researches.filter(r => r.type === 'new').length;
+            if(document.getElementById('stat-sups')) document.getElementById('stat-sups').innerText = supervisors.length;
+            if(document.getElementById('stat-students')) document.getElementById('stat-students').innerText = researches.length * 2;
+            if(document.getElementById('stat-approved')) document.getElementById('stat-approved').innerText = researches.filter(r => r.type === 'old').length;
+            if(document.getElementById('stat-pending')) document.getElementById('stat-pending').innerText = researches.filter(r => r.type === 'new').length;
         }
 
         function switchTab(tabId) {
@@ -516,6 +558,7 @@
 
         function updateDropdowns() {
             const majorSel = document.getElementById('reg-major');
+            if(!majorSel) return;
             majorSel.innerHTML = '';
             if(departments.length === 0) {
                 majorSel.innerHTML = `<option value="">الرجاء إضافة تخصصات من لوحة الإدارة أولاً</option>`;
@@ -532,7 +575,6 @@
             }
         }
 
-        // دالة حساب نسبة التشابه الدقيقة والفحص في الخانة الخاصة
         function calculateSimilarity(str1, str2) {
             let s1 = str1.trim().toLowerCase();
             let s2 = str2.trim().toLowerCase();
@@ -546,14 +588,18 @@
             return percentage > 90 ? 90 : percentage;
         }
 
-        function checkTitleSimilarity(inputTitle) {
+        function triggerSimilarityCheck() {
+            const inputTitle = document.getElementById('reg-title').value.trim();
+            const s1Name = document.getElementById('s1-name').value.trim();
+            const s2Name = document.getElementById('s2-name').value.trim();
+            
             const box = document.getElementById('similarity-box');
             const percentEl = document.getElementById('similarity-percentage');
             const detailsEl = document.getElementById('similarity-details');
             const statusEl = document.getElementById('similarity-status-text');
             const submitBtn = document.getElementById('submit-btn');
 
-            if (!inputTitle || inputTitle.trim().length < 3) {
+            if (!inputTitle || inputTitle.length < 3) {
                 box.classList.add('hidden');
                 currentSimilarityResult = { percentage: 0, status: 'مقبول', matchTitle: 'لا يوجد' };
                 return;
@@ -564,6 +610,10 @@
 
             researches.forEach(r => {
                 let sim = calculateSimilarity(inputTitle, r.title);
+                r.students.forEach(st => {
+                    if(s1Name && st.name.includes(s1Name)) sim = Math.max(sim, 95);
+                    if(s2Name && st.name.includes(s2Name)) sim = Math.max(sim, 95);
+                });
                 if (sim > maxSim) {
                     maxSim = sim;
                     matchedTitle = r.title;
@@ -572,16 +622,15 @@
 
             currentSimilarityResult.percentage = maxSim;
             percentEl.innerText = maxSim + "%";
-
             box.classList.remove('hidden');
 
             if (maxSim >= 60) {
-                currentSimilarityResult.status = 'مرفوض (تشابه عالي)';
+                currentSimilarityResult.status = 'مرفوض (تشابه عالي جداً)';
                 currentSimilarityResult.matchTitle = matchedTitle;
                 box.className = "p-3 rounded-xl border text-xs space-y-2 bg-red-50 border-red-300 text-red-950";
                 percentEl.className = "px-2.5 py-1 rounded-full text-white text-[11px] bg-red-600";
-                statusEl.innerText = "حالة العنوان: مرفوض بسبب تقارب العنوان أو تطابقه!";
-                detailsEl.innerHTML = `⚠️ نسبة التشابه <b>(${maxSim}%)</b> مع البحث المسجل سابقاً: <i>"${matchedTitle}"</i>. لا يُقترح تسجيله لتجنب الازدواجية.`;
+                statusEl.innerText = "حالة البحث: مرفوض بسبب التطابق!";
+                detailsEl.innerHTML = `⚠️ نسبة التشابه <b>(${maxSim}%)</b> مع البحث المسجل مسبقاً: <i>"${matchedTitle}"</i>. لا يُسمح بالتسجيل.`;
                 submitBtn.disabled = true;
                 submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
             } else if (maxSim >= 30) {
@@ -589,8 +638,8 @@
                 currentSimilarityResult.matchTitle = matchedTitle;
                 box.className = "p-3 rounded-xl border text-xs space-y-2 bg-amber-50 border-amber-300 text-amber-950";
                 percentEl.className = "px-2.5 py-1 rounded-full text-white text-[11px] bg-amber-600";
-                statusEl.innerText = "حالة العنوان: مقبول (تشابه متوسط مع الأرشيف)";
-                detailsEl.innerHTML = `⚡ نسبة التشابه <b>(${maxSim}%)</b> مع البحث: <i>"${matchedTitle}"</i>. مسموح التسجيل مع ضرورة مراجعة المشرف.`;
+                statusEl.innerText = "حالة البحث: مقبول (تشابه متوسط)";
+                detailsEl.innerHTML = `⚡ نسبة التشابه <b>(${maxSim}%)</b> مع البحث: <i>"${matchedTitle}"</i>. يتطلب مراجعة المشرف.`;
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             } else {
@@ -598,30 +647,51 @@
                 currentSimilarityResult.matchTitle = 'لا يوجد تطابق مسبق';
                 box.className = "p-3 rounded-xl border text-xs space-y-2 bg-emerald-50 border-emerald-300 text-emerald-950";
                 percentEl.className = "px-2.5 py-1 rounded-full text-white text-[11px] bg-emerald-600";
-                statusEl.innerText = "حالة العنوان: مقبول ممتاز (عنوان جديد وفريد)";
-                detailsEl.innerHTML = `✅ نسبة التشابه منخفضة جداً <b>(${maxSim}%)</b>. العنوان فريد وجاهز للاعتماد والتسجيل.`;
+                statusEl.innerText = "حالة البحث: مقبول ممتاز (عنوان وفريد)";
+                detailsEl.innerHTML = `✅ نسبة التشابه منخفضة جداً <b>(${maxSim}%)</b>. العنوان جاهز للاعتماد.`;
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
 
-        // دالة طباعة وثيقة نتيجة فحص التشابه وحالة البحث
-        function printSimilarityCertificate() {
+        function previewSimilarityCertificate() {
             const title = document.getElementById('reg-title').value.trim();
-            if(!title) {
-                alert('الرجاء إدخال عنوان البحث في خانة الفحص أولاً!');
+            const s1 = document.getElementById('s1-name').value.trim();
+            if(!title || !s1) {
+                alert('الرجاء إدخال اسم الطالب الأول وعنوان البحث على الأقل لمعاينة وثيقة الفحص!');
                 return;
             }
+
+            const previewHtml = `
+                <div style="text-align: right; line-height: 1.8;">
+                    <p><b>عنوان البحث:</b> ${title}</p>
+                    <p><b>اسم الطالب الأول:</b> ${s1}</p>
+                    <p><b>نسبة التشابه المحسوبة:</b> <span style="color: ${currentSimilarityResult.percentage >= 60 ? 'red' : 'green'}; font-weight: bold;">${currentSimilarityResult.percentage}%</span></p>
+                    <p><b>حالة الفحص النهائية:</b> <span style="font-weight: bold; color: ${currentSimilarityResult.percentage >= 60 ? '#b91c1c' : '#047857'};">${currentSimilarityResult.status}</span></p>
+                    <p><b>أقرب مطابقة في الأرشيف:</b> ${currentSimilarityResult.matchTitle}</p>
+                    <p><b>تاريخ الفحص:</b> ${new Date().toLocaleString('ar-LY')}</p>
+                </div>
+            `;
+
+            document.getElementById('preview-content').innerHTML = previewHtml;
+            document.getElementById('preview-modal').classList.remove('hidden');
+        }
+
+        function confirmPrintCertificate() {
+            document.getElementById('preview-modal').classList.add('hidden');
+            const title = document.getElementById('reg-title').value.trim();
+            const s1 = document.getElementById('s1-name').value.trim();
 
             let htmlContent = `
                 <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 30px; max-width: 800px; margin: auto; border: 2px solid #1e3a8a; border-radius: 12px;">
                     <div style="text-align: center; border-bottom: 2px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 20px;">
                         <h2 style="color: #1e3a8a; margin: 0; font-size: 18px;">وزارة التعليم التقني العالي</h2>
-                        <h3 style="color: #111827; margin: 5px 0; font-size: 16px;">كلية العلوم والتقنية الشاطئ</h3>
+                        <h3 style="color: #111827; margin: 5px 0; font-size: 16px;">كلية العلوم والتقنية الزوية الشاطئ</h3>
                         <h4 style="color: #4b5563; margin: 5px 0; font-size: 14px;">وثيقة الفحص الذكي للتشابه وازدواجية العناوين</h4>
                     </div>
                     
                     <div style="margin-bottom: 20px; font-size: 14px; line-height: 2;">
+                        <p><b>الطالب المقدم للبحث:</b> ${s1}</p>
                         <p><b>عنوان البحث المفحوص:</b> ${title}</p>
                         <p><b>نسبة التشابه المحسوبة:</b> <span style="color: ${currentSimilarityResult.percentage >= 60 ? 'red' : 'green'}; font-weight: bold;">${currentSimilarityResult.percentage}%</span></p>
                         <p><b>حالة البحث النهائية:</b> <span style="font-weight: bold; color: ${currentSimilarityResult.percentage >= 60 ? '#b91c1c' : '#047857'};">${currentSimilarityResult.status}</span></p>
@@ -681,7 +751,7 @@
             researches.push({ id: Date.now(), type, year, title, major, supervisor, students, pdfName, similarity: currentSimilarityResult.percentage });
             saveData();
             logAction(`تسجيل بحث جديد: ${title} بنسبة تشابه ${currentSimilarityResult.percentage}%`);
-            alert('تم تسجيل البحث بنجاح!');
+            alert('تم تسجيل البحث بنجاح سحابياً!');
             document.getElementById('researchForm').reset();
             document.getElementById('reg-year').value = '2025/2026';
             document.getElementById('similarity-box').classList.add('hidden');
@@ -690,6 +760,7 @@
 
         function renderStudents() {
             const tbody = document.getElementById('students-table-body');
+            if(!tbody) return;
             tbody.innerHTML = '';
             if(researches.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">لا توجد بحوث مسجلة حالياً</td></tr>`;
@@ -724,7 +795,7 @@
                 <div style="direction: rtl; font-family: 'Cairo', sans-serif; padding: 20px;">
                     <div style="text-align: center; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px;">
                         <h2 style="color: #1e3a8a; margin: 0; font-size: 16px;">وزارة التعليم التقني العالي</h2>
-                        <h3 style="color: #111827; margin: 5px 0; font-size: 14px;">كلية العلوم والتقنية الشاطئ</h3>
+                        <h3 style="color: #111827; margin: 5px 0; font-size: 14px;">كلية العلوم والتقنية الزوية الشاطئ</h3>
                         <h4 style="color: #4b5563; margin: 5px 0; font-size: 13px;">`;
             
             if(type === 'current') htmlContent += `تقرير البحوث الجارية وقيد الإنجاز`;
@@ -786,11 +857,11 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `Shatei_Grad_System_Backup_${new Date().toISOString().slice(0,10)}.json`);
+            dlAnchor.setAttribute("download", `Shatei_Grad_System_Cloud_Backup_${new Date().toISOString().slice(0,10)}.json`);
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();
-            logAction('تصدير نسخة احتياطية Backup');
+            logAction('تصدير نسخة احتياطية سحابية');
         }
 
         function importBackup(e) {
@@ -808,7 +879,7 @@
                         defenseSessions = parsed.defenseSessions || [];
                         auditLogs = parsed.auditLogs || [];
                         saveData();
-                        alert('تمت استعادة النسخة الاحتياطية بنجاح!');
+                        alert('تمت استعادة البيانات سحابياً بنجاح!');
                         location.reload();
                     } else {
                         alert('ملف النسخة الاحتياطية غير صالح!');
@@ -829,7 +900,7 @@
                 document.getElementById('new-dept').value = '';
                 renderAdminLists();
                 logAction(`إضافة تخصص: ${val}`);
-                alert('تمت إضافة التخصص بنجاح!');
+                alert('تمت إضافة التخصص سحابياً بنجاح!');
             }
         }
 
@@ -850,7 +921,7 @@
             document.getElementById('sup-spec').value = '';
             renderAdminLists();
             logAction(`إضافة مشرف: ${name}`);
-            alert('تمت إضافة المشرف بنجاح!');
+            alert('تمت إضافة المشرف سحابياً بنجاح!');
         }
 
         function deleteSup(index) {
@@ -870,7 +941,7 @@
                 document.getElementById('admin-name').value = '';
                 document.getElementById('admin-pass').value = '';
                 renderAdminLists();
-                logAction(`إضافة حساب أدمن جديد: ${user}`);
+                logAction(`إضافة حساب أدمن سحابي: ${user}`);
                 alert('تمت إضافة الأدمن الجديد بنجاح!');
             }
         }
@@ -888,26 +959,33 @@
 
         function renderAdminLists() {
             const deptList = document.getElementById('admin-dept-list');
-            deptList.innerHTML = '';
-            departments.forEach((d, i) => {
-                deptList.innerHTML += `<div class="flex justify-between items-center bg-white p-2 rounded border text-xs"><span>${d}</span> <button onclick="deleteDept(${i})" class="text-red-500 font-bold">حذف</button></div>`;
-            });
+            if(deptList) {
+                deptList.innerHTML = '';
+                departments.forEach((d, i) => {
+                    deptList.innerHTML += `<div class="flex justify-between items-center bg-white p-2 rounded border text-xs"><span>${d}</span> <button onclick="deleteDept(${i})" class="text-red-500 font-bold">حذف</button></div>`;
+                });
+            }
 
             const supList = document.getElementById('admin-sup-list');
-            supList.innerHTML = '';
-            supervisors.forEach((s, i) => {
-                supList.innerHTML += `<div class="flex justify-between items-center bg-white p-2 rounded border text-xs"><span>${s.name}</span> <button onclick="deleteSup(${i})" class="text-red-500 font-bold">حذف</button></div>`;
-            });
+            if(supList) {
+                supList.innerHTML = '';
+                supervisors.forEach((s, i) => {
+                    supList.innerHTML += `<div class="flex justify-between items-center bg-white p-2 rounded border text-xs"><span>${s.name}</span> <button onclick="deleteSup(${i})" class="text-red-500 font-bold">حذف</button></div>`;
+                });
+            }
 
             const adminList = document.getElementById('admin-users-list');
-            adminList.innerHTML = '';
-            admins.forEach((a, i) => {
-                adminList.innerHTML += `<div class="flex justify-between items-center bg-white p-2 rounded border text-xs"><span>${a.user}</span> <button onclick="deleteAdmin(${i})" class="text-red-500 font-bold">حذف</button></div>`;
-            });
+            if(adminList) {
+                adminList.innerHTML = '';
+                admins.forEach((a, i) => {
+                    adminList.innerHTML += `<div class="flex justify-between items-center bg-white p-2 rounded border text-xs"><span>${a.user}</span> <button onclick="deleteAdmin(${i})" class="text-red-500 font-bold">حذف</button></div>`;
+                });
+            }
         }
 
         function renderAuditLogs() {
             const box = document.getElementById('audit-log-box');
+            if(!box) return;
             box.innerHTML = '';
             if(auditLogs.length === 0) {
                 box.innerHTML = `<p class="text-gray-400">لا توجد عمليات مسجلة بعد.</p>`;
@@ -920,6 +998,7 @@
 
         function renderSupervisors() {
             const grid = document.getElementById('supervisors-grid');
+            if(!grid) return;
             grid.innerHTML = '';
             if(supervisors.length === 0) {
                 grid.innerHTML = `<p class="text-gray-400 text-sm">لا توجد أسماء مشرفين مضافة حالياً.</p>`;
@@ -940,11 +1019,8 @@
             });
             saveData();
             logAction(`جدولة مناقشة: ${document.getElementById('def-title').value}`);
-            alert('تمت جدولة مناقشة البحث بنجاح!');
+            alert('تمت جدولة مناقشة البحث سحابياً بنجاح!');
         }
-
-        updateDashboardStats();
-        updateDropdowns();
     </script>
 </body>
 </html>
